@@ -14,13 +14,17 @@ $form.Text = 'Log Search Tool'
 $form.Size = New-Object System.Drawing.Size(720, 580)
 $form.BackColor = $darkBackground
 $form.ForeColor = $lightText
-$form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
+$form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::Sizable
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
 $form.TopMost = $true
 
 # Set the icon
 $iconPath = "$PSScriptRoot\icon.ico"
-$form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($iconPath)
+if (Test-Path $iconPath) {
+    $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($iconPath)
+} else {
+    Write-Host "Favicon not found at $iconPath"
+}
 
 function Set-ControlTheme($control, [System.Drawing.Color]$backColor) {
     $control.BackColor = $backColor
@@ -41,11 +45,13 @@ $labelFilePath = New-Object System.Windows.Forms.Label
 $labelFilePath.Location = New-Object System.Drawing.Point(20, 20)
 $labelFilePath.Size = New-Object System.Drawing.Size(280, 20)
 $labelFilePath.Text = 'Log File Path:'
+$labelFilePath.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
 $form.Controls.Add($labelFilePath)
 
 $textBoxFilePath = New-Object System.Windows.Forms.TextBox
 $textBoxFilePath.Location = New-Object System.Drawing.Point(20, 45)
 $textBoxFilePath.Size = New-Object System.Drawing.Size(550, 25)
+$textBoxFilePath.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
 Set-ControlTheme $textBoxFilePath $darkControl
 $form.Controls.Add($textBoxFilePath)
 
@@ -53,6 +59,7 @@ $buttonBrowse = New-Object System.Windows.Forms.Button
 $buttonBrowse.Location = New-Object System.Drawing.Point(580, 44)
 $buttonBrowse.Size = New-Object System.Drawing.Size(100, 27)
 $buttonBrowse.Text = 'Browse'
+$buttonBrowse.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
 Set-ControlTheme $buttonBrowse $darkButton
 $buttonBrowse.Add_Click({
     $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
@@ -67,12 +74,14 @@ $labelPatterns = New-Object System.Windows.Forms.Label
 $labelPatterns.Location = New-Object System.Drawing.Point(20, 80)
 $labelPatterns.Size = New-Object System.Drawing.Size(280, 20)
 $labelPatterns.Text = 'Search Patterns (comma-separated):'
+$labelPatterns.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
 $form.Controls.Add($labelPatterns)
 
 $textBoxPatterns = New-Object System.Windows.Forms.TextBox
 $textBoxPatterns.Location = New-Object System.Drawing.Point(20, 105)
 $textBoxPatterns.Size = New-Object System.Drawing.Size(660, 25)
 $textBoxPatterns.Text = 'DEBUG:root:Raw video data:,Relevance scores'
+$textBoxPatterns.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
 Set-ControlTheme $textBoxPatterns $darkControl
 $form.Controls.Add($textBoxPatterns)
 
@@ -80,6 +89,7 @@ $buttonSearch = New-Object System.Windows.Forms.Button
 $buttonSearch.Location = New-Object System.Drawing.Point(20, 140)
 $buttonSearch.Size = New-Object System.Drawing.Size(100, 30)
 $buttonSearch.Text = 'Search'
+$buttonSearch.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
 Set-ControlTheme $buttonSearch $darkButton
 $buttonSearch.Add_Click({
     $outputBox.Clear()
@@ -94,6 +104,7 @@ $buttonCopyToClipboard = New-Object System.Windows.Forms.Button
 $buttonCopyToClipboard.Location = New-Object System.Drawing.Point(130, 140)
 $buttonCopyToClipboard.Size = New-Object System.Drawing.Size(130, 30)
 $buttonCopyToClipboard.Text = 'Copy to Clipboard'
+$buttonCopyToClipboard.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
 Set-ControlTheme $buttonCopyToClipboard $darkButton
 $buttonCopyToClipboard.Add_Click({
     [System.Windows.Forms.Clipboard]::SetText($outputBox.Text)
@@ -104,6 +115,7 @@ $buttonSaveToFile = New-Object System.Windows.Forms.Button
 $buttonSaveToFile.Location = New-Object System.Drawing.Point(270, 140)
 $buttonSaveToFile.Size = New-Object System.Drawing.Size(100, 30)
 $buttonSaveToFile.Text = 'Save to File'
+$buttonSaveToFile.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
 Set-ControlTheme $buttonSaveToFile $darkButton
 $buttonSaveToFile.Add_Click({
     $saveFileDialog = New-Object System.Windows.Forms.SaveFileDialog
@@ -121,7 +133,11 @@ $outputBox.Font = New-Object System.Drawing.Font("Consolas", 10)
 $outputBox.MultiLine = $true
 $outputBox.ScrollBars = "Vertical"
 $outputBox.ReadOnly = $true
+$outputBox.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
 Set-ControlTheme $outputBox $darkControl
 $form.Controls.Add($outputBox)
+
+# Set minimum size for the form
+$form.MinimumSize = New-Object System.Drawing.Size(720, 580)
 
 $form.ShowDialog()
